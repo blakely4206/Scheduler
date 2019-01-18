@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="542.0" prefWidth="834.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scheduler.CustomerScreenController">
+   <children>
+      <GridPane layoutX="209.0" layoutY="97.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="433.0" minHeight="10.0" prefHeight="433.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="210.0" minHeight="10.0" prefHeight="109.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <FlowPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TableView fx:id="tableCustomers" prefHeight="403.0" prefWidth="834.0">
+                    <columns>
+                      <TableColumn fx:id="CustID" prefWidth="75.0" text="ID" />
+                      <TableColumn fx:id="CustName" prefWidth="183.0" text="Name" />
+                        <TableColumn fx:id="CustAddress" prefWidth="438.0" text="Address" />
+                        <TableColumn fx:id="CustPhone" prefWidth="135.0" text="Phone" />
+                    </columns>
+                  </TableView>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="37.0" prefWidth="834.0" GridPane.rowIndex="1">
+               <children>
+                  <Label text="Customers">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <FlowPane.margin>
+                        <Insets left="30.0" />
+                     </FlowPane.margin>
+                  </Label>
+                  <Button fx:id="btnNew" mnemonicParsing="false" onAction="#btnNew_onAction" text="New">
+                     <FlowPane.margin>
+                        <Insets left="400.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button fx:id="btnModify" mnemonicParsing="false" onAction="#btnModify_onAction" text="Modify">
+                     <FlowPane.margin>
+                        <Insets left="30.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDelete_onAction" text="Delete">
+                     <FlowPane.margin>
+                        <Insets left="15.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button fx:id="btnBack" mnemonicParsing="false" onAction="#btnBack_onAction" text="Back">
+                     <FlowPane.margin>
+                        <Insets left="50.0" />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

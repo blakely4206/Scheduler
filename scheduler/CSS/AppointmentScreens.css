@@ -1,0 +1,16 @@
+.date-picker .text-field:disabled{
+    -fx-opacity: 1.0 ;
+    -fx-background-color: white;
+}
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: dodgerblue;
+}
+
+.date-picker-popup > * > .today {
+    -fx-border-color: black;
+}
+
+.date-picker-popup > * > .previous-month,
+.date-picker-popup > * > .next-month {
+    -fx-background-color: aliceblue;
+}

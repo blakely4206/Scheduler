@@ -1,0 +1,9 @@
+.text-area:disabled{
+    -fx-opacity: 1 ;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+.text-input > .scroll-pane:disabled {
+    -fx-opacity: 1;
+}
+
