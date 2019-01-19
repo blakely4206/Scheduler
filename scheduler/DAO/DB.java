@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -334,6 +335,111 @@ public class DB {
                 PreparedStatement prepped_query = conn.prepareStatement(query);
                 prepped_query.setString(1, theUser.getUserName());
                 
+                ResultSet results = prepped_query.executeQuery();
+                
+            while(results.next()){
+                
+                LocalDateTime start = results.getTimestamp("start").toLocalDateTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+                LocalDateTime end = results.getTimestamp("end").toLocalDateTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+ 
+                apptList.add(new Appointment(
+                        results.getInt("appointmentId"),
+                        results.getString("customerName"),
+                        results.getInt("customerId"),
+                        new User(results.getInt("userId"), results.getString("userName")),
+                        results.getString("title"), 
+                        results.getString("description"), 
+                        results.getString("location"), 
+                        results.getString("contact"), 
+                        results.getString("type"),
+                        results.getString("url"), 
+                        start, 
+                        end));  
+            }
+                Close();
+            }
+            catch(SQLException ex){
+                System.out.println("SQL Error: " + ex.getLocalizedMessage());
+            }
+            
+            return apptList; 
+        }
+        
+        public static ObservableList<Appointment> ReturnAppointmentsForTheWeek()throws SQLException{
+            
+            ObservableList<Appointment> apptList = FXCollections.observableArrayList();
+
+            Calendar c = Calendar.getInstance();
+          //  c.setTime(new SimpleDateFormat("MMM").parse(LocalDateTime.now().getMonth().toString()));
+            int week = c.get(Calendar.WEEK_OF_YEAR);
+            System.out.println(week);
+                
+            try{
+                Connect();   
+
+                String query = 
+                "SELECT * FROM  appointment  LEFT JOIN  customer ON  appointment.customerId =  customer.customerId "+
+                "LEFT JOIN user ON appointment.userId = user.userId "+
+                "WHERE appointment.createdBy= ?  AND end > current_timestamp AND WEEK(start)= ? AND YEAR(start)= ?  "+ 
+                "ORDER BY start ASC;";
+                
+                PreparedStatement prepped_query = conn.prepareStatement(query);
+                prepped_query.setString(1, theUser.getUserName());
+                prepped_query.setInt(2,week);
+                prepped_query.setInt(3,LocalDate.now().getYear());
+                
+                ResultSet results = prepped_query.executeQuery();
+                
+            while(results.next()){
+                
+                LocalDateTime start = results.getTimestamp("start").toLocalDateTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+                LocalDateTime end = results.getTimestamp("end").toLocalDateTime().atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+ 
+                apptList.add(new Appointment(
+                        results.getInt("appointmentId"),
+                        results.getString("customerName"),
+                        results.getInt("customerId"),
+                        new User(results.getInt("userId"), results.getString("userName")),
+                        results.getString("title"), 
+                        results.getString("description"), 
+                        results.getString("location"), 
+                        results.getString("contact"), 
+                        results.getString("type"),
+                        results.getString("url"), 
+                        start, 
+                        end));  
+            }
+                Close();
+            }
+            catch(SQLException ex){
+                System.out.println("SQL Error: " + ex.getLocalizedMessage());
+            }
+            
+            return apptList; 
+        }
+        
+        public static ObservableList<Appointment> ReturnAppointmentsForTheMonth()throws SQLException, ParseException{
+            
+            ObservableList<Appointment> apptList = FXCollections.observableArrayList();
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(new SimpleDateFormat("MMM").parse(LocalDateTime.now().getMonth().toString()));
+            int month = c.get(Calendar.MONTH) + 1; 
+                
+            try{
+                Connect();   
+
+                String query = 
+                "SELECT * FROM  appointment  LEFT JOIN  customer ON  appointment.customerId =  customer.customerId "+
+                "LEFT JOIN user ON appointment.userId = user.userId "+
+                "WHERE appointment.createdBy= ?  AND end > current_timestamp AND MONTH(start)= ?  AND YEAR(start)= ? "+
+                "ORDER BY start ASC;";
+                
+                PreparedStatement prepped_query = conn.prepareStatement(query);
+                prepped_query.setString(1, theUser.getUserName());
+                prepped_query.setInt(2, month);
+                 prepped_query.setInt(3, LocalDateTime.now().getYear());
+                System.out.println(prepped_query.toString());
                 ResultSet results = prepped_query.executeQuery();
                 
             while(results.next()){

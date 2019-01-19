@@ -40,9 +40,14 @@
                         <Insets left="50.0" />
                      </FlowPane.margin>
                   </Button>
+                  <ComboBox fx:id="comboMonthWeek" onAction="#comboMonthWeek_onAction" prefHeight="25.0" prefWidth="118.0">
+                     <FlowPane.margin>
+                        <Insets left="50.0" />
+                     </FlowPane.margin>
+                  </ComboBox>
                   <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#btnLogOut_onAction" prefHeight="25.0" prefWidth="73.0" text="Log Out">
                      <FlowPane.margin>
-                        <Insets left="400.0" />
+                        <Insets left="250.0" />
                      </FlowPane.margin>
                   </Button>
                </children>

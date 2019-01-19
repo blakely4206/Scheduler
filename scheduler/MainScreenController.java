@@ -6,9 +6,12 @@ import scheduler.Exception.InvalidInputException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +22,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -34,6 +38,8 @@ public class MainScreenController implements Initializable {
     @FXML private Button btnAppt;
     @FXML private Button btnModify;
     
+    @FXML private ComboBox comboMonthWeek;
+    
     @FXML private TableView<Appointment> tableAppt;
     
     @FXML private TableColumn<Appointment, String> colType;
@@ -44,6 +50,18 @@ public class MainScreenController implements Initializable {
     @FXML private TableColumn<Appointment, String> colContact;
     @FXML private TableColumn<Appointment, String> colCust;
     @FXML private TableColumn<Appointment, String> colTitle;
+    
+    @FXML
+    private void comboMonthWeek_onAction(ActionEvent event) throws SQLException, ParseException{
+        switch (comboMonthWeek.getSelectionModel().getSelectedItem().toString()) {
+            case "ALL":   tableAppt.setItems(DB.ReturnAppointments());
+                break;
+            case "MONTH": tableAppt.setItems(DB.ReturnAppointmentsForTheMonth());
+                break;
+            default: tableAppt.setItems(DB.ReturnAppointmentsForTheWeek());
+                break;
+        }
+    }
     
     @FXML private void btnCust_onAction(ActionEvent event){
          try{
@@ -178,6 +196,7 @@ public class MainScreenController implements Initializable {
             colTitle.setCellValueFactory(new PropertyValueFactory("title"));
             
             tableAppt.setItems(DB.ReturnAppointments());
+           
         }
         catch(SQLException ex){}
     }
@@ -196,6 +215,12 @@ public class MainScreenController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-     PopulateTable();
+      comboMonthWeek.getItems().add("ALL");
+      comboMonthWeek.getItems().add("MONTH");
+      comboMonthWeek.getItems().add("WEEK");
+      comboMonthWeek.getSelectionModel().select("ALL");
+      
+        PopulateTable();
+     
     }
 }
