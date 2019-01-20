@@ -41,7 +41,7 @@ public class LogInController implements Initializable {
     Locale local;
     
     @FXML
-    private void btnLogin_onAction(ActionEvent event)throws SQLException{
+    private void btnLogin_onAction(ActionEvent event)throws SQLException, ClassNotFoundException{
         if(!txtPwrd.getText().isEmpty() && !txtUsername.getText().isEmpty()) {
             try{
                 setUser(DB.ValidateUser(txtUsername.getText().trim(), SHA1(txtPwrd.getText().trim())));

@@ -40,9 +40,8 @@ public class DB {
         
         private static User theUser;
         
-        public static void Connect() throws SQLException{
+        private static void Connect() throws SQLException, ClassNotFoundException, IOException{
      
-        try{
             Properties dbProperties = new Properties();
             dbProperties.load(DB.class.getResourceAsStream("DB.properties"));
             
@@ -54,22 +53,10 @@ public class DB {
             Class.forName(driver);
             
             conn = DriverManager.getConnection(url,user,pass);
-        } 
-        catch (ClassNotFoundException ex) {
-            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        catch (SQLException e) {
-            System.out.println("SQLException: "+e.getMessage());
-            System.out.println("SQLState: "+e.getSQLState());
-            System.out.println("VendorError: "+e.getErrorCode());
-        }
-        catch(IOException ex){
-            System.out.println("Database Properties File Error: " + ex.getMessage());
-        }
        }   
         
-        public static User ValidateUser(String username, String pwrd){
-           try {
+        public static User ValidateUser(String username, String pwrd) throws ClassNotFoundException, IOException, SQLException{
+      
             Connect();   
             
             String query = "SELECT * FROM user WHERE user.userName= ? AND user.password= ? ;";
@@ -88,25 +75,14 @@ public class DB {
                     }
                 }
             Close();
-            } 
-            catch (SQLException e) {
-                System.out.println("SQLException: " + e.getMessage());
-            }
+            
             return null;
         }
         
-        public static void Close() throws SQLException{
-            try {
-                conn.close(); 
-            }
-            catch(SQLException e){
-                System.out.println("SQLException: " + e.getMessage());
-            }
-        }
+        private static void Close() throws SQLException{conn.close(); }
         
-        public static User ReturnUser(String username) throws SQLException{
+        public static User ReturnUser(String username) throws SQLException, ClassNotFoundException, IOException{
           
-            try {
                 Connect();   
                 
                 String query = "SELECT * FROM user WHERE userName= ?;";
@@ -115,21 +91,18 @@ public class DB {
                 
                 ResultSet results = prepped_query.executeQuery();
                 if(results.next()){     
-                   return new User(results.getInt("userId"), results.getString("userName")); 
+                    Close();
+                    return new User(results.getInt("userId"), results.getString("userName")); 
                 }
-                Close();
-            } 
-            catch (SQLException e) {
-                System.out.println("SQLException: " + e.getMessage());
-            }
+                
+            Close();
             return null;
         }
         
         
-        public static ObservableList<User> ReturnUsers()throws SQLException{
+        public static ObservableList<User> ReturnUsers()throws SQLException, ClassNotFoundException, IOException{
             ObservableList<User> theList = FXCollections.observableArrayList();
             
-             try {
                 Connect();   
                 
                 String query = "SELECT * FROM user";
@@ -141,18 +114,13 @@ public class DB {
                 }
                 
                 Close();
-            } 
-            catch (SQLException e) {
-                System.out.println("SQLException: " + e.getMessage());
-            }
             
             return theList;
         }
 
-        public static ObservableList<Appointment> ReturnAppointmentByUser(User user){
+        public static ObservableList<Appointment> ReturnAppointmentByUser(User user) throws SQLException, ClassNotFoundException, IOException{
             ObservableList<Appointment> apptList = FXCollections.observableArrayList();
 
-            try{
                 Connect();   
                 
                 String query = 
@@ -184,18 +152,15 @@ public class DB {
                         end));  
             }
                 Close();
-            }
-            catch(SQLException ex){
-                System.out.println("SQL Error: " + ex.getLocalizedMessage());
-            }
             
             return apptList; 
         }
         
-        public static ObservableList<Appointment> ReturnAppointmentByLocation(String location, String monthString, int year){
+        public static ObservableList<Appointment> ReturnAppointmentByLocation(String location, String monthString, int year) 
+                throws SQLException, ClassNotFoundException, IOException, ParseException{
+            
             ObservableList<Appointment> apptList = FXCollections.observableArrayList();
   
-            try{
                 Connect();   
                 Calendar c = Calendar.getInstance();
                 c.setTime(new SimpleDateFormat("MMM").parse(monthString));
@@ -210,7 +175,7 @@ public class DB {
                 prepped_query.setString(1, location);
                 prepped_query.setInt(2, month);
                 prepped_query.setInt(3, year);
-                System.out.println(prepped_query.toString());
+                
                 ResultSet results = prepped_query.executeQuery();
                 
             while(results.next()){
@@ -233,19 +198,12 @@ public class DB {
                         end));  
             }
                 Close();
-            }
-            catch(SQLException ex){
-                System.out.println("SQL Error: " + ex.getLocalizedMessage());
-            } catch (ParseException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
             
             return apptList; 
         }
         
-        public static boolean DeleteCustomer(Customer customer){
-            
-            try {    
+        public static boolean DeleteCustomer(Customer customer) throws SQLException, ClassNotFoundException, IOException{
+               
                 Connect();
                 
                 String deleteAppts = "DELETE FROM appointment WHERE customerId=? ;";
@@ -262,17 +220,12 @@ public class DB {
                 
                 Close();
                 return true;
-            }
-                catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return false;
         }
         
-        public static ObservableList ReturnCustomers()throws SQLException{
+        public static ObservableList ReturnCustomers()throws SQLException, ClassNotFoundException, IOException{
 
             ObservableList<Customer> customerList = FXCollections.observableArrayList();
-            try{
+       
                 Connect();   
                 Statement statement = conn.createStatement();
                 String query = 
@@ -293,14 +246,12 @@ public class DB {
                 results.getString("phone")));
             }
             Close();
-            }
-            catch(SQLException ex){}
+            
             return customerList; 
         }
         
-        public static boolean DeleteAppointment(Appointment appt){
-            
-            try {    
+        public static boolean DeleteAppointment(Appointment appt) throws SQLException, ClassNotFoundException, IOException{
+             
                 Connect();
                 
                 String deleteAppts = "DELETE FROM appointment WHERE appointmentId=? ;";
@@ -313,18 +264,13 @@ public class DB {
                 
                 Close();
                 return true;
-            }
-                catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return false;
+            
         }
         
-        public static ObservableList<Appointment> ReturnAppointments()throws SQLException{
+        public static ObservableList<Appointment> ReturnAppointments()throws SQLException, ClassNotFoundException, IOException{
             
             ObservableList<Appointment> apptList = FXCollections.observableArrayList();
 
-            try{
                 Connect();   
 
                 String query = 
@@ -357,24 +303,17 @@ public class DB {
                         end));  
             }
                 Close();
-            }
-            catch(SQLException ex){
-                System.out.println("SQL Error: " + ex.getLocalizedMessage());
-            }
             
             return apptList; 
         }
         
-        public static ObservableList<Appointment> ReturnAppointmentsForTheWeek()throws SQLException{
+        public static ObservableList<Appointment> ReturnAppointmentsForTheWeek()throws SQLException, ClassNotFoundException, IOException{
             
             ObservableList<Appointment> apptList = FXCollections.observableArrayList();
 
             Calendar c = Calendar.getInstance();
-          //  c.setTime(new SimpleDateFormat("MMM").parse(LocalDateTime.now().getMonth().toString()));
             int week = c.get(Calendar.WEEK_OF_YEAR);
-            System.out.println(week);
                 
-            try{
                 Connect();   
 
                 String query = 
@@ -410,15 +349,11 @@ public class DB {
                         end));  
             }
                 Close();
-            }
-            catch(SQLException ex){
-                System.out.println("SQL Error: " + ex.getLocalizedMessage());
-            }
             
             return apptList; 
         }
         
-        public static ObservableList<Appointment> ReturnAppointmentsForTheMonth()throws SQLException, ParseException{
+        public static ObservableList<Appointment> ReturnAppointmentsForTheMonth()throws SQLException, ParseException, ClassNotFoundException, IOException{
             
             ObservableList<Appointment> apptList = FXCollections.observableArrayList();
 
@@ -426,7 +361,6 @@ public class DB {
             c.setTime(new SimpleDateFormat("MMM").parse(LocalDateTime.now().getMonth().toString()));
             int month = c.get(Calendar.MONTH) + 1; 
                 
-            try{
                 Connect();   
 
                 String query = 
@@ -438,8 +372,8 @@ public class DB {
                 PreparedStatement prepped_query = conn.prepareStatement(query);
                 prepped_query.setString(1, theUser.getUserName());
                 prepped_query.setInt(2, month);
-                 prepped_query.setInt(3, LocalDateTime.now().getYear());
-                System.out.println(prepped_query.toString());
+                prepped_query.setInt(3, LocalDateTime.now().getYear());
+                 
                 ResultSet results = prepped_query.executeQuery();
                 
             while(results.next()){
@@ -462,19 +396,15 @@ public class DB {
                         end));  
             }
                 Close();
-            }
-            catch(SQLException ex){
-                System.out.println("SQL Error: " + ex.getLocalizedMessage());
-            }
             
             return apptList; 
         }
         
-        public static int ReturnAppointmentCountByType(String type, String monthString, int year)throws SQLException, ParseException{
+        public static int ReturnAppointmentCountByType(String type, String monthString, int year)
+                throws SQLException, ParseException, ClassNotFoundException, IOException{
             
             int count = 0;
 
-            try{
                 Connect();   
 
                 Calendar c = Calendar.getInstance();
@@ -499,15 +429,11 @@ public class DB {
             }
             
                 Close();
-            }
-            catch(SQLException ex){
-                System.out.println("SQL Error: " + ex.getLocalizedMessage());
-            }
             
             return count; 
         }
         
-        public static ArrayList ReturnCountries()throws SQLException{
+        public static ArrayList ReturnCountries()throws SQLException, ClassNotFoundException, IOException{
             ArrayList<Country> theList = new ArrayList<>();
 
             Connect();   
@@ -527,7 +453,7 @@ public class DB {
             return theList;
         }
         
-        public static ArrayList ReturnCities()throws SQLException{
+        public static ArrayList ReturnCities()throws SQLException, ClassNotFoundException, IOException{
             ArrayList<City> theList = new ArrayList<>();
 
             Connect();  
@@ -548,9 +474,9 @@ public class DB {
             return theList;
         }
         
-        public static void CreateCustomer(String customerName, Address address, User user)throws SQLException{
+        public static void CreateCustomer(String customerName, Address address, User user)throws SQLException, ClassNotFoundException, IOException{
                 Connect();   
-                //Create address, query the auto-incremented id, then create new customer
+                
                 String insert = "INSERT INTO address "
                         + "(address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdateBy) " +
                           "VALUES (?,?,?,?,?,CURDATE(),?,?)";
@@ -592,7 +518,7 @@ public class DB {
                 
                 Close();
         }
-        public static void CreateAppointment(Appointment appt)throws SQLException{
+        public static void CreateAppointment(Appointment appt)throws SQLException, ClassNotFoundException, IOException{
            
          Connect();        
                 
@@ -626,7 +552,7 @@ public class DB {
                 Close();
         }
        
-        public static void CreateCity(String city, int countryId, String user){
+        public static void CreateCity(String city, int countryId, String user) throws ClassNotFoundException, IOException{
             try {   
                 Connect();
              
@@ -648,109 +574,92 @@ public class DB {
             }
         }
         
-        public static Customer ReturnCustomer(int customerId){
-            try {   
+        public static Customer ReturnCustomer(int customerId)throws SQLException, ClassNotFoundException, IOException{
+      
                 Connect();
             
-                Statement statement = conn.createStatement();
+                String query = "SELECT * FROM customer WHERE customerId= ? ;";
+                PreparedStatement prepped_query = conn.prepareStatement(query);
                 
-                String query = "SELECT * FROM customer WHERE customerId=" + customerId + ";";
-                ResultSet results = statement.executeQuery(query);
+                prepped_query.setInt(1, customerId);
+                ResultSet results = prepped_query.executeQuery();
                 results.next();
                 Customer c = new Customer(results.getInt("customerId"), results.getString("customerName"), results.getInt("addressId"));
                 
                 Close();
                 return c;
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
         }
         
-        public static Address ReturnAddress(int addressId){
-            try {   
+        public static Address ReturnAddress(int addressId)throws SQLException, ClassNotFoundException, IOException{
+          
                 Connect();
             
-                Statement statement = conn.createStatement();
+                String query = "SELECT * FROM address WHERE addressId= ? ;";
+                PreparedStatement prepped_query = conn.prepareStatement(query);
+                prepped_query.setInt(1, addressId);
                 
-                String query = "SELECT * FROM address WHERE addressId=" + addressId + ";";
-                ResultSet results = statement.executeQuery(query);
+                ResultSet results = prepped_query.executeQuery();
+                
                 results.next();
                 Address a = new Address(results.getInt("addressId"), results.getString("address"), results.getString("address2"),
                        results.getInt("cityId"), results.getString("postalCode"), results.getString("phone")) ;
                 
                 Close();
                 return a;
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
         }
         
-        public static City ReturnCity(int cityId){
-            try {   
-                Connect();
+        public static City ReturnCity(int cityId)throws SQLException, ClassNotFoundException, IOException{
             
-                Statement statement = conn.createStatement();
+                Connect();
                 
-                String query = "SELECT * FROM city WHERE cityId=" + cityId + ";";
-                ResultSet results = statement.executeQuery(query);
+                String query = "SELECT * FROM city WHERE cityId= ? ;";
+                PreparedStatement prepped_query = conn.prepareStatement(query);
+                prepped_query.setInt(1, cityId);
+                
+                ResultSet results = prepped_query.executeQuery();
                 results.next();
                 City c = new City(results.getInt("cityId"), results.getString("city"), results.getInt("countryId"));
                 
                 Close();
                 return c;
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
         }
         
-        public static City ReturnCity(String cityName){
-            try {   
+        public static City ReturnCity(String cityName)throws SQLException, ClassNotFoundException, IOException{
+        
                 Connect();
-            
-                Statement statement = conn.createStatement();
                 
-                String query = "SELECT * FROM city WHERE city='" + cityName + "';";
-                ResultSet results = statement.executeQuery(query);
+                String query = "SELECT * FROM city WHERE city= ? ;";
+                PreparedStatement prepped_query = conn.prepareStatement(query);
+                prepped_query.setString(1, cityName);
+                
+                ResultSet results = prepped_query.executeQuery();
                 results.next();
                 City c = new City(results.getInt("cityId"), results.getString("city"), results.getInt("countryId"));
                 
                 Close();
                 return c;
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
         }
         
-        public static Country ReturnCountry(int countryId){
-            try {   
+        public static Country ReturnCountry(int countryId)throws SQLException, ClassNotFoundException, IOException{
+          
                 Connect();
             
                 Statement statement = conn.createStatement();
                 
-                String query = "SELECT * FROM country WHERE countryId=" + countryId + ";";
-                ResultSet results = statement.executeQuery(query);
+                String query = "SELECT * FROM country WHERE countryId= ? ;";
+                PreparedStatement prepped_query = conn.prepareStatement(query);
+                prepped_query.setInt(1, countryId);
+                
+                ResultSet results = prepped_query.executeQuery();
                 results.next();
                 Country c = new Country(results.getInt("countryId"), results.getString("country"));
                 
                 Close();
                 return c;
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return null;
         }
         
-        public static void UpdateCustomer(Customer cust){
-            try {   
+        public static void UpdateCustomer(Customer cust)throws SQLException, ClassNotFoundException, IOException{
+   
                 Connect();
 
                 String update = "UPDATE customer SET customerName= ? WHERE customerId = ? ;";
@@ -763,14 +672,10 @@ public class DB {
                 statement.executeUpdate();    
                 
                 Close();
-            }
-            catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
         
-        public static void UpdateAddress(Address address){
-            try {   
+        public static void UpdateAddress(Address address)throws SQLException, ClassNotFoundException, IOException{
+            
                 Connect();
                 
                 String update = "UPDATE address SET address= ? , address2= ? , cityId= ? , postalCode= ? , phone= ? WHERE addressId= ? ;";
@@ -786,13 +691,9 @@ public class DB {
                 statement.executeUpdate();     
                 
                 Close();
-            }
-                catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
         
-        public static void UpdateAppointment(Appointment appt, User user) throws SQLException{
+        public static void UpdateAppointment(Appointment appt, User user) throws SQLException, ClassNotFoundException, IOException{
             Connect();
             
             ZonedDateTime z_start = appt.getT_start().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
@@ -819,14 +720,14 @@ public class DB {
             statement.setTimestamp(9, t_end);
             statement.setString(10, user.getUserName());
             statement.setInt(11, appt.getAppointmentId());
-            System.out.println(statement.toString());
+            
             statement.executeUpdate();
             
             Close();
         }
         
-        public static boolean AppointmentOverlap(Appointment appt, User user){
-        try {   
+        public static boolean AppointmentOverlap(Appointment appt, User user)throws SQLException, ClassNotFoundException, IOException{
+
                 Connect();
                 
                 ZonedDateTime z_start = appt.getT_start().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC"));
@@ -847,15 +748,12 @@ public class DB {
                 ResultSet results = statement.executeQuery();  
                 
                 if(results.next()){
+                    Close();
                     return true;
                 }
-                
-                Close();
-            }
-                catch (SQLException ex) {
-                Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            return false;
+                else{
+                    Close();
+                    return false;
+                }
         }
 }

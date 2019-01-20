@@ -48,8 +48,8 @@ public class ReportsController implements Initializable {
     
     
     @FXML
-    private void btnBack_onAction(ActionEvent event){
-        try{
+    private void btnBack_onAction(ActionEvent event) throws SQLException, ClassNotFoundException, IOException{
+        
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("MainScreen.fxml"));
             Parent p = loader.load();
@@ -63,12 +63,12 @@ public class ReportsController implements Initializable {
             st.setTitle("Scheduler: " + user.getUserName());
             st.setScene(sc);
             st.show();           
-        }
-        catch(IOException ex){}
+        
     }
     
     @FXML
-    private void btnLocation_onAction(ActionEvent event){
+    private void btnLocation_onAction(ActionEvent event) 
+            throws SQLException, ClassNotFoundException, IOException, ParseException{
         try{
             if(comboLocation.getSelectionModel().getSelectedItem() == null){
                 throw new InvalidInputException("Select a Location");
@@ -113,7 +113,7 @@ public class ReportsController implements Initializable {
             st.setScene(sc);
             st.show();           
         }
-        catch(IOException | InvalidInputException ex){
+        catch(InvalidInputException ex){
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("ERROR"); 
             alert.setContentText(ex.getMessage());
@@ -122,7 +122,7 @@ public class ReportsController implements Initializable {
     }
     
     @FXML
-    private void btnUserReport_onAction(ActionEvent event){
+    private void btnUserReport_onAction(ActionEvent event) throws SQLException, ClassNotFoundException, IOException{
      try{
         if(comboUsers.getSelectionModel().getSelectedItem() == null){
             throw new InvalidInputException("Select a User");
@@ -155,7 +155,7 @@ public class ReportsController implements Initializable {
             st.setScene(sc);
             st.show();           
         }
-        catch(IOException | InvalidInputException ex){
+        catch(InvalidInputException ex){
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("ERROR"); 
             alert.setContentText(ex.getMessage());
@@ -217,7 +217,8 @@ public class ReportsController implements Initializable {
     }
     
     @FXML
-    private void btnTypeReport_onAction(ActionEvent event) throws SQLException, ParseException{
+    private void btnTypeReport_onAction(ActionEvent event) 
+            throws SQLException, ParseException, ClassNotFoundException, IOException{
          try{
         if(comboTypes.getSelectionModel().getSelectedItem() == null){
             throw new InvalidInputException("Select a User");
@@ -262,7 +263,7 @@ public class ReportsController implements Initializable {
                 st.show();           
             }
         }
-        catch(IOException | SQLException | InvalidInputException ex){
+        catch(InvalidInputException ex){
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("ERROR"); 
             alert.setContentText(ex.getMessage());
@@ -283,7 +284,7 @@ public class ReportsController implements Initializable {
         try {
             comboUsers.setItems(DB.ReturnUsers());
         } 
-        catch (SQLException ex) {
+        catch (SQLException | ClassNotFoundException | IOException ex) {
             Logger.getLogger(ReportsController.class.getName()).log(Level.SEVERE, null, ex);
         }
         

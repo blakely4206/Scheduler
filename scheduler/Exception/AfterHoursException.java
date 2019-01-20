@@ -10,7 +10,6 @@ public class AfterHoursException extends Exception{
         this.heading = "Outside of Work Hours";
         this.message = message;
     }
-  
     
     public String getHeading(){
         return this.heading;

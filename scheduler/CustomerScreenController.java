@@ -60,7 +60,7 @@ public class CustomerScreenController implements Initializable {
     }
     
      @FXML
-    private void btnModify_onAction(ActionEvent event){  
+    private void btnModify_onAction(ActionEvent event) throws SQLException, ClassNotFoundException{  
         try{
             if(tableCustomers.getSelectionModel().getSelectedItem() != null){
                 FXMLLoader loader = new FXMLLoader();
@@ -83,7 +83,7 @@ public class CustomerScreenController implements Initializable {
     }
     
      @FXML
-    private void btnDelete_onAction(ActionEvent event){
+    private void btnDelete_onAction(ActionEvent event) throws SQLException, ClassNotFoundException, IOException{
        if(DB.DeleteCustomer(tableCustomers.getSelectionModel().getSelectedItem())){
           Alert a = new Alert(Alert.AlertType.CONFIRMATION);
           a.setTitle("Success");
@@ -94,8 +94,8 @@ public class CustomerScreenController implements Initializable {
     }
     
      @FXML
-    private void btnBack_onAction(ActionEvent event){
-         try{
+    private void btnBack_onAction(ActionEvent event) throws SQLException, IOException, ClassNotFoundException{
+        
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("MainScreen.fxml"));
             Parent p = loader.load();
@@ -107,8 +107,6 @@ public class CustomerScreenController implements Initializable {
             MainScreenController ctrl = loader.getController();
             ctrl.setUser(user);
             st.show();           
-        }
-        catch(IOException ex){}
     }
     
     private void FillTables(){

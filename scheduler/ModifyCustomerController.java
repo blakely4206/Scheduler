@@ -57,7 +57,7 @@ public class ModifyCustomerController implements Initializable {
     @FXML private TextField txtPhone;
     @FXML private TextField txtPostal;
     
-    public void ReceiveCustomer(int custId){
+    public void ReceiveCustomer(int custId) throws SQLException, ClassNotFoundException, IOException{
       this.cust = DB.ReturnCustomer(custId);
       this.add = DB.ReturnAddress(cust.getAddressId());
       this.city = DB.ReturnCity(add.getCityId());
@@ -117,7 +117,7 @@ public class ModifyCustomerController implements Initializable {
     }
     
     @FXML 
-    private void btnSave_onAction(ActionEvent event)throws SQLException{
+    private void btnSave_onAction(ActionEvent event)throws SQLException, ClassNotFoundException, IOException{
       
         try{
           if(comboCountry.getValue() == null){
@@ -185,8 +185,9 @@ public class ModifyCustomerController implements Initializable {
             City newCity = new City(0,"Add New City", 0);
             comboCity.getItems().add(newCity);
             comboCity.getItems().addAll(DB.ReturnCities());
-        } catch (SQLException ex) {
-            Logger.getLogger(NewCustomerController.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        catch (ClassNotFoundException | SQLException | IOException ex) {
+            Logger.getLogger(ModifyCustomerController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

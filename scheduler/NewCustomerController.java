@@ -45,47 +45,26 @@ public class NewCustomerController implements Initializable {
     
     public void Receive_Held_Values(String name, String address, String address2, String phone, String postal, Country country, City city, User user){
     
-        if(name != null){
-            txtName.setText(name);
-        }
-        if(address != null){
-           txtAddress.setText(address);
-        }
-        if(address2 != null){
-            txtAddress2.setText(address2);
-        }
-        if(phone != null){
-           txtPhone.setText(phone);
-        }
-        if(postal != null){
-           txtPostal.setText(postal);
-        }
-        if(country != null){
-            comboCountry.setValue(country);
-        }
-        if(city != null){
-            comboCity.setValue(city);
-        }
+        txtName.setText(name);
+
+        txtAddress.setText(address);
+        txtAddress2.setText(address2);
+        txtPhone.setText(phone);
+        txtPostal.setText(postal);
+        comboCountry.setValue(country);
+        comboCity.setValue(city);
+
         setUser(user);
     }
     
     public void Receive_Held_Values(String name, String address, String address2, String phone, String postal, User user){
 
-        if(name != null){
-            txtName.setText(name);
-        }
-        if(address != null){
-           txtAddress.setText(address);
-        }
-        if(address2 != null){
-            txtAddress2.setText(address2);
-        }
-        if(phone != null){
-           txtPhone.setText(phone);
-        }
-        if(postal != null){
-           txtPostal.setText(postal);
-        }
+        txtName.setText(name);
+        txtAddress.setText(address);
+        txtAddress2.setText(address2);
+        txtPhone.setText(phone);
+        txtPostal.setText(postal);
+
         setUser(user);
     }
     
@@ -133,7 +112,7 @@ public class NewCustomerController implements Initializable {
     }
     
     @FXML 
-    private void btnSave_onAction(ActionEvent event)throws SQLException{
+    private void btnSave_onAction(ActionEvent event)throws SQLException, IOException, ClassNotFoundException{
       
         try{
           if(comboCountry.getValue() == null){
@@ -165,8 +144,7 @@ public class NewCustomerController implements Initializable {
               String _postal = txtPostal.getText().trim();
               
               DB.CreateCustomer(_name,new Address(_address, _address2, city, _postal, _phone),user);
-              
-            try{
+           
                 FXMLLoader loader = new FXMLLoader();
                 loader.setLocation(getClass().getResource("CustomerScreen.fxml"));
                 Parent p = loader.load();
@@ -179,8 +157,6 @@ public class NewCustomerController implements Initializable {
                 st.setTitle("Customer: " + user.getUserName());
                 st.setScene(sc);
                 st.show();           
-            }
-            catch(IOException ex){}
             }
         } 
         catch (InvalidInputException ex) {
@@ -206,7 +182,7 @@ public class NewCustomerController implements Initializable {
             City newCity = new City(0,"Add New City", 0);
             comboCity.getItems().add(newCity);
             comboCity.getItems().addAll(DB.ReturnCities());
-        } catch (SQLException ex) {
+        } catch (SQLException | ClassNotFoundException | IOException ex) {
             Logger.getLogger(NewCustomerController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

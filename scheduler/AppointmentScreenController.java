@@ -63,7 +63,7 @@ public class AppointmentScreenController implements Initializable {
     @FXML TableColumn<Customer, String> cust;
     
     @FXML
-    private void btnSave_onAction(ActionEvent event)throws SQLException{
+    private void btnSave_onAction(ActionEvent event)throws SQLException, ClassNotFoundException{
       try{
           Customer customer;
 
@@ -155,7 +155,7 @@ public class AppointmentScreenController implements Initializable {
     }
     
     @FXML
-    private void btnCancel_onAction(ActionEvent event){
+    private void btnCancel_onAction(ActionEvent event) throws SQLException, ClassNotFoundException{
         try{
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("MainScreen.fxml"));
@@ -202,14 +202,10 @@ public class AppointmentScreenController implements Initializable {
     }
     
     private int ConvertTo24HourClock(String AMPM, int hour){
-       
-        System.out.println(AMPM);
         if(AMPM.equals("PM") &&  hour != 12){
-            System.out.println("Hour + 12" + (hour + 12));
             return  hour += 12;
           }
         else{
-            System.out.println("Hour: " + hour);
             return hour;
         }
     }

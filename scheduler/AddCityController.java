@@ -14,11 +14,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import scheduler.DAO.DB;
+import scheduler.Exception.InvalidInputException;
 import scheduler.Model.Country;
 import scheduler.Model.User;
 
@@ -49,14 +51,17 @@ public class AddCityController implements Initializable {
     }
     
     @FXML
-    private void btnSave_onAction(ActionEvent event){
-        
-        Country c = (Country)comboCountry.getValue();
-        String city = txtName.getText().trim().toUpperCase();
-        
-        System.out.println(c.getCountry() + city);
-        DB.CreateCity(city, c.getCountryId(), user.getUserName());
+    private void btnSave_onAction(ActionEvent event) throws SQLException, IOException, ClassNotFoundException{
         try{
+            System.out.println(comboCountry.getSelectionModel().getSelectedItem().toString());
+            if("Country".equals(comboCountry.getSelectionModel().getSelectedItem().toString())){
+                throw new InvalidInputException("Select a Country");
+            }
+            
+            Country c = (Country)comboCountry.getValue();
+            String city = txtName.getText().trim().toUpperCase();
+            DB.CreateCity(city, c.getCountryId(), user.getUserName());
+
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("NewCustomer.fxml"));
             Parent p = loader.load();
@@ -64,15 +69,20 @@ public class AddCityController implements Initializable {
 
             Stage st = (Stage)((Node)event.getSource()).getScene().getWindow();
             st.setTitle("New Customer");
-             
+
             st.setScene(sc);
-            
+
             NewCustomerController ctrl = loader.getController();
             ctrl.Receive_Held_Values(name, address, address2, phone, postal, ((Country)comboCountry.getValue()), DB.ReturnCity(city), user);
             ctrl.setUser(user);
             st.show();  
         }
-        catch(IOException ex){}
+        catch(InvalidInputException ex){
+          Alert a = new Alert(Alert.AlertType.ERROR);
+          a.setTitle(ex.getHeading());
+          a.setContentText(ex.getMessage());
+          a.showAndWait();
+        }
     }
     
     @FXML
@@ -111,9 +121,8 @@ public class AddCityController implements Initializable {
         try {
             comboCountry.getItems().addAll(DB.ReturnCountries());
         } 
-        catch (SQLException ex) {
+        catch (SQLException | ClassNotFoundException | IOException ex) {
             Logger.getLogger(AddCityController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }    
-    
+        }    
+    }
 }

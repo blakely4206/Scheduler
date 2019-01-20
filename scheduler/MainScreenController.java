@@ -13,6 +13,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -52,11 +54,11 @@ public class MainScreenController implements Initializable {
     @FXML private TableColumn<Appointment, String> colTitle;
     
     @FXML
-    private void comboMonthWeek_onAction(ActionEvent event) throws SQLException, ParseException{
+    private void comboMonthWeek_onAction(ActionEvent event) throws SQLException, ParseException, ClassNotFoundException, IOException{
         switch (comboMonthWeek.getSelectionModel().getSelectedItem().toString()) {
             case "ALL":   tableAppt.setItems(DB.ReturnAppointments());
                 break;
-            case "MONTH": tableAppt.setItems(DB.ReturnAppointmentsForTheMonth());
+            case "THIS MONTH": tableAppt.setItems(DB.ReturnAppointmentsForTheMonth());
                 break;
             default: tableAppt.setItems(DB.ReturnAppointmentsForTheWeek());
                 break;
@@ -80,7 +82,7 @@ public class MainScreenController implements Initializable {
         catch(IOException ex){}
     }
     
-    @FXML private void btnDelete_onAction(ActionEvent event){
+    @FXML private void btnDelete_onAction(ActionEvent event) throws ParseException, SQLException, ClassNotFoundException, IOException{
         if(tableAppt.getSelectionModel().getSelectedItem() != null){
             DB.DeleteAppointment(tableAppt.getSelectionModel().getSelectedItem());
         }
@@ -125,7 +127,7 @@ public class MainScreenController implements Initializable {
     }
   
     @FXML
-    private void btnModify_onAction(ActionEvent event){
+    private void btnModify_onAction(ActionEvent event) throws SQLException, ClassNotFoundException, IOException{
         try{
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("ModifyAppointment.fxml"));
@@ -148,7 +150,7 @@ public class MainScreenController implements Initializable {
             st.setScene(sc);
             st.show();           
         }
-        catch(IOException | InvalidInputException  ex){
+        catch(InvalidInputException  ex){
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Error"); 
             alert.setContentText(ex.getMessage());
@@ -157,8 +159,8 @@ public class MainScreenController implements Initializable {
     }
     
      @FXML
-    private void btnLogOut_onAction(ActionEvent event){
-        try{
+    private void btnLogOut_onAction(ActionEvent event)throws IOException{
+
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("LogIn.fxml"));
             Parent p = loader.load();
@@ -168,24 +170,20 @@ public class MainScreenController implements Initializable {
             Stage st = (Stage)((Node)event.getSource()).getScene().getWindow();
             st.setTitle("Scheduler - Log In");
             st.setScene(sc);
-            st.show();           
-        }
-        catch(IOException ex){
-            System.out.println(ex.toString());
-        } 
+            st.show();     
     }
     
     public User getUser(){
         return this.user;
     }
     
-    public void setUser(User user){
+    public void setUser(User user) throws SQLException, ClassNotFoundException, IOException{
         this.user = user;
         DB.ReturnAppointmentByUser(user).forEach(a->AppointmentAlert(a)); //Lambda and foreach are used as a more efficent and less verbose way to iterate list
     }
     
-    public void PopulateTable(){
-         try{
+    public void PopulateTable() throws ParseException, ClassNotFoundException, SQLException, IOException{
+     
             colType.setCellValueFactory(new PropertyValueFactory("type"));
             colDesc.setCellValueFactory(new PropertyValueFactory("description"));
             colURL.setCellValueFactory(new PropertyValueFactory("url"));
@@ -195,10 +193,7 @@ public class MainScreenController implements Initializable {
             colCust.setCellValueFactory(new PropertyValueFactory("customerName"));
             colTitle.setCellValueFactory(new PropertyValueFactory("title"));
             
-            tableAppt.setItems(DB.ReturnAppointments());
-           
-        }
-        catch(SQLException ex){}
+            tableAppt.setItems(DB.ReturnAppointmentsForTheMonth());          
     }
     
     private void AppointmentAlert(Appointment appt){
@@ -216,11 +211,15 @@ public class MainScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
       comboMonthWeek.getItems().add("ALL");
-      comboMonthWeek.getItems().add("MONTH");
-      comboMonthWeek.getItems().add("WEEK");
-      comboMonthWeek.getSelectionModel().select("ALL");
+      comboMonthWeek.getItems().add("THIS MONTH");
+      comboMonthWeek.getItems().add("THIS WEEK");
+      comboMonthWeek.getSelectionModel().select("THIS MONTH");
       
-        PopulateTable();
+        try {
+            PopulateTable();
+        } catch (ParseException | ClassNotFoundException | IOException | SQLException ex) {
+            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
      
     }
 }

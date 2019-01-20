@@ -65,7 +65,7 @@ public class ModifyAppointmentController implements Initializable {
     @FXML TableColumn<Customer, String> cust;
     
     @FXML
-    private void btnSave_onAction(ActionEvent event)throws SQLException{
+    private void btnSave_onAction(ActionEvent event)throws SQLException, ClassNotFoundException{
       try{     
           appt.setUrl(txtURL.getText());
           appt.setTitle(txtTitle.getText());
@@ -136,8 +136,8 @@ public class ModifyAppointmentController implements Initializable {
     }
     
     @FXML
-    private void btnCancel_onAction(ActionEvent event){
-        try{
+    private void btnCancel_onAction(ActionEvent event) throws SQLException, ClassNotFoundException, IOException{
+
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("MainScreen.fxml"));
             Parent p = loader.load();
@@ -150,8 +150,6 @@ public class ModifyAppointmentController implements Initializable {
             st.setTitle("Scheduler: " + user.getUserName());
             st.setScene(sc);
             st.show();           
-        }
-        catch(IOException ex){}
     }
     
     private boolean TestForOverlap(Appointment appt, Appointment a){      
@@ -190,7 +188,7 @@ public class ModifyAppointmentController implements Initializable {
         catch(Exception ex){}
     }
     
-    public void AcceptAppt(Appointment a){
+    public void AcceptAppt(Appointment a) throws ClassNotFoundException, IOException, SQLException{
      
     setAppt(a);
     
@@ -204,7 +202,6 @@ public class ModifyAppointmentController implements Initializable {
     
     comboStartHr.getSelectionModel().select(ConvertTo12HourClock(a.getT_start()));
     comboEndHr.getSelectionModel().select(ConvertTo12HourClock(a.getT_end()));
-    System.out.println(ConvertTo12HourClock(a.getT_start()) + " : " + ConvertTo12HourClock(a.getT_end()));
 
     comboLocation.getSelectionModel().select(appt.getLocation());
     
@@ -215,11 +212,10 @@ public class ModifyAppointmentController implements Initializable {
     
     datepickerStart.setValue(appt.getT_start().toLocalDate());
     
-    try{
-        cust.setCellValueFactory(new PropertyValueFactory("customerName"));
-        tableCustomers.setItems(DB.ReturnCustomers());
-    }
-    catch(SQLException ex){}
+   
+    cust.setCellValueFactory(new PropertyValueFactory("customerName"));
+    tableCustomers.setItems(DB.ReturnCustomers());
+    
      
     tableCustomers.getItems().forEach(c->SelectCustomer(c));     //Lambda and foreach is used to be more efficent and less verbose than using a for loop.
     }
